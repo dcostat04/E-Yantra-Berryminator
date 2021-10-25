@@ -1,4 +1,4 @@
-# Shape-Color-and-coordinate-detction-using-opencv
+# Shape-Color-and-coordinate-detction-using-opencv(Task 1A E-Yantra)
 
 In this program we find the following details for each image in the manner shown below:
 
