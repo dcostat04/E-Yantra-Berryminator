@@ -16,7 +16,7 @@
 '''
 
 # Team ID:			[ 1263 ]
-# Author List:		[ Names of team members worked on this file separated by Comma: Name1, Name2, ... ]
+# Author List:		[ Names of team members worked on this file separated by Comma: Trevor Dcosta, Malcolm Dias, Adithya Basker,Sumedh Chinchmalatpure ]
 # Filename:			task_1a.py
 # Functions:		detect_shapes
 # 					[ Comma separated list of functions in this file ]
