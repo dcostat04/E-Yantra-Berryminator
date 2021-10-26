@@ -18,8 +18,8 @@ cX => Int value (centroid coordinate of shape on horizontal X-axis direction)<br
 cY => Int value (centroid coordinate of shape on vertical Y-axis direction)<br>
 
 # Sample Screenshots
-[(https://github.com/dcostat04/Shape-Color-and-coordinate-detction-using-opencv/blob/main/ggt.PNG)]
-[https://github.com/dcostat04/Shape-Color-and-coordinate-detction-using-opencv/blob/main/ed.PNG]
+[![MY HEADER](https://github.com/dcostat04/Shape-Color-and-coordinate-detction-using-opencv/blob/main/ggt.PNG)]
+[![MY HEADER](https://github.com/dcostat04/Shape-Color-and-coordinate-detction-using-opencv/blob/main/ed.PNG)]
 
 # Work in Progress
 still more things to be done
