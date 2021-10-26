@@ -41,49 +41,45 @@ def detect_shapes(img, ):
 	detected_shapes = []
 
 	##############	ADD YOUR CODE HERE	##############
-	lower = {'red': ([166, 84, 141]), 'green': ([50, 50, 120]), 'blue': ([97, 100, 117]), 'yellow': ([23, 59, 119]),'orange': ([0, 50, 80]), 'purple': ([130, 80, 80])}
-	upper = {'red': ([186, 255, 255]), 'green': ([70, 255, 255]), 'blue': ([117, 255, 255]), 'yellow': ([54, 255, 255]),'orange': ([20, 255, 255]), 'purple': ([150, 255, 255])}
-	colors = {'red': (0, 0, 255), 'green': (0, 255, 0), 'blue': (255, 0, 0), 'yellow': (0, 255, 217),'orange': (0, 140, 255), 'purple': (211, 0, 148)}
+	# lower = {'red': ([166, 84, 141]), 'green': ([50, 50, 120]), 'blue': ([97, 100, 117]), 'yellow': ([23, 59, 119]),'orange': ([0, 50, 80]), 'purple': ([130, 80, 80])}
+	# upper = {'red': ([186, 255, 255]), 'green': ([70, 255, 255]), 'blue': ([117, 255, 255]), 'yellow': ([54, 255, 255]),'orange': ([20, 255, 255]), 'purple': ([150, 255, 255])}
+	# colors = {'red': (0, 0, 255), 'green': (0, 255, 0), 'blue': (255, 0, 0), 'yellow': (0, 255, 217),'orange': (0, 140, 255), 'purple': (211, 0, 148)}
 
 	imgGrey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 	blurred = cv2.GaussianBlur(img, (11, 11), 0)
 	hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
 	_, thrash = cv2.threshold(imgGrey, 240, 255, cv2.THRESH_BINARY)
-	contours, _ = cv2.findContours(thrash, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+	contours, _ = cv2.findContours(thrash, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
 
-
-	# cv2.imshow("img", img)
 	for contour in contours:
+		ks = []
 		approx = cv2.approxPolyDP(contour, 0.01 * cv2.arcLength(contour, True), True)
-		cv2.drawContours(img, [approx], 0, (0, 0, 0), 5)
-		x = approx.ravel()[0]
-		y = approx.ravel()[1] - 5
+		# cv2.drawContours(img, [approx], 0, (0, 0, 0), 5)
+		M = cv2.moments(contour)
 		if len(approx) == 3:
-			# cv2.putText(img, "Triangle", (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 0))
 			objectType = 'Triangle'
 		elif len(approx) == 4:
 			x1, y1, w, h = cv2.boundingRect(approx)
 			aspectRatio = float(w) / h
 			print(aspectRatio)
 			if aspectRatio >= 0.95 and aspectRatio <= 1.05:
-				# cv2.putText(img, "square", (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 0))
 				objectType = 'square'
 			else:
-				# cv2.putText(img, "rectangle", (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 0))
 				objectType = 'rectangle'
 		elif len(approx) == 5:
-			# cv2.putText(img, "Pentagon", (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 0))
 			objectType = 'Pentagon'
 		else:
-			# cv2.putText(img, "Circle", (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 0))
 			objectType = 'Circle'
 
-	detected_shapes.append(objectType)
-	get_labeled_image(img, detected_shapes)
-	cv2.imshow("shapes", img)
-	cv2.waitKey(2000)
-	cv2.destroyAllWindows()
+		ks.append("green")
+		ks.append(objectType)
+		cX = int(M['m10'] / M['m00'])
+		cY = int(M['m01'] / M['m00'])
+		gg=(cX,cY)
+		ks.append(gg)
+
+		detected_shapes.append(ks)
 
 	##################################################
 	
