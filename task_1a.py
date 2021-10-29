@@ -89,6 +89,8 @@ def detect_shapes(img):
 		kg = []
 		peri = cv2.arcLength(cnt, True)
 		vertices = cv2.approxPolyDP(cnt, 0.04 * peri, True)
+		approx = cv2.approxPolyDP(cnt, 0.01 * cv2.arcLength(cnt, True), True)
+		cv2.drawContours(img, [approx], 0, (0, 0, 0), 5) 
 
 		M = cv2.moments(cnt)
 
