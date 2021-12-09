@@ -33,93 +33,77 @@ import os
 ##############################################################
 
 ################# ADD UTILITY FUNCTIONS HERE #################
-
+def color_difference (color1, color2):
+	return sum([abs(component1-component2) for component1, component2 in zip(color1, color2)])
 ##############################################################
 
-def detect_shapes(img):
+def detect_shapes(img, ):
 	"""
-	Purpose:
-	---
-	This function takes the image as an argument and returns a nested list
-	containing details of colored (non-white) shapes in that image
+		Purpose:
+		---
+		This function takes the image as an argument and returns a nested list
+		containing details of colored (non-white) shapes in that image
+		Input Arguments:
+		---
+		`img` :	[ numpy array ]
+				numpy array of image returned by cv2 library
+		Returns:
+		---
+		`detected_shapes` : [ list ]
+				nested list containing details of colored (non-white)
+				shapes present in image
 
-	Input Arguments:
-	---
-	`img` :	[ numpy array ]
-			numpy array of image returned by cv2 library
-
-	Returns:
-	---
-	`detected_shapes` : [ list ]
-			nested list containing details of colored (non-white) 
-			shapes present in image
-
-	Example call:
-	---
-	shapes = detect_shapes(img)
-	"""
-	
-	##############	ADD YOUR CODE HERE	##############
+		Example call:
+		---
+		shapes = detect_shapes(img)
+		"""
 	detected_shapes = []
-	lower = {'red': ([166, 84, 141]), 'green': ([50, 50, 120]), 'blue': ([80, 10, 0]), 'yellow': ([23, 59, 119]),
-			 'orange': ([0, 50, 80]), 'purple': ([130, 80, 80])}  # assign new item lower['blue'] = (93, 10, 0)
-	upper = {'red': ([186, 255, 255]), 'green': ([70, 255, 255]), 'blue': ([128, 255, 255]), 'yellow': ([54, 255, 255]),
-			 'orange': ([20, 255, 255]), 'purple': ([150, 255, 255])}
 
+	##############	ADD YOUR CODE HERE	##############
+	imgGry = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+	ret, binary = cv2.threshold(imgGry, 220, 255, cv2.THRESH_BINARY)
+	contours, hierarchy = cv2.findContours(binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+	contours=contours[1:]
 
-	blurred = cv2.GaussianBlur(img, (11, 11), 0)
-	hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
-	mlist = []
-	clist = []
-	ks = []
-
-	for (key, value) in upper.items():
-
-		kernel = np.ones((2, 2), np.uint8)
-		mask = cv2.inRange(hsv, np.array(lower[key]), np.array(upper[key]))
-		mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-		mask = cv2.dilate(mask, kernel, iterations=1)
-		mlist.append(mask)
-		cnts, _ = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-		if len(cnts) >= 1:
-			clist.append(cnts[-1])
-			ks.append(key)
-
-	for i, cnt in enumerate(clist):
-		kg = []
-		peri = cv2.arcLength(cnt, True)
-		vertices = cv2.approxPolyDP(cnt, 0.04 * peri, True)
-		approx = cv2.approxPolyDP(cnt, 0.01 * cv2.arcLength(cnt, True), True)
-		cv2.drawContours(img, [approx], 0, (0, 0, 0), 5) 
-
-		M = cv2.moments(cnt)
-
-		if len(vertices) == 3:
-			objectType = ' Triangle'
-			obj=ks[i]
-		elif len(vertices) == 4:
-			x1, y1, w, h = cv2.boundingRect(vertices)
-			aspectRatio = float(w) / h
-			if aspectRatio >= 0.95 and aspectRatio <= 1.05:
-				objectType = 'Square'
-				obj = ks[i]
+	for contour in contours:
+		shape = None
+		color = None
+		cX,cY = 0,0
+		epsilon = 0.03 * cv2.arcLength(contour, True)
+		approx = cv2.approxPolyDP(contour,epsilon , True)
+		if len(approx) == 3:
+			shape = "Triangle"
+		elif len(approx) == 4:
+			rect = cv2.minAreaRect(approx)
+			w,h = rect[1]
+			aspectRatio = float(w / h)
+			if aspectRatio < 0.95 or aspectRatio > 1.05:
+				shape = "Rectangle"
 			else:
-				objectType = 'Rectangle'
-				obj = ks[i]
-		elif len(vertices) == 5:
-			objectType = 'Pentagon'
-			obj = ks[i]
+				shape = "Square"
+		elif len(approx) == 5:
+			shape = "Pentagon"
 		else:
-			objectType = 'Circle'
-			obj = ks[i]
+			shape = "Circle"
 
-		kg.append(obj)
-		kg.append(objectType)
+		M = cv2.moments(contour)
 		cX = int(M['m10'] / M['m00'])
 		cY = int(M['m01'] / M['m00'])
-		gg = (cX, cY)
-		kg.append(gg)
-		detected_shapes.append(kg)
+
+		b,g,r = img[cY,cX]
+		if (b>250) and (g<5) and (r<5):
+			color ="Blue"
+		elif (b<5) and (g>250) and (r<5):
+			color = "Green"
+		elif (b<5) and (g<5) and (r>250):
+			color = "Red"
+		elif (b<5) and (g>135)and(g<155) and (r>250):
+			color = "Orange"
+		else:
+			pass
+
+		detected_shapes.append([color, shape, (cX, cY)])
+
 	##################################################
 
 	return detected_shapes
@@ -131,16 +115,13 @@ def get_labeled_image(img, detected_shapes):
 	---
 	This function takes the image and the detected shapes list as an argument
 	and returns a labelled image
-
 	Input Arguments:
 	---
 	`img` :	[ numpy array ]
 			numpy array of image returned by cv2 library
-
 	`detected_shapes` : [ list ]
-			nested list containing details of colored (non-white) 
+			nested list containing details of colored (non-white)
 			shapes present in image
-
 	Returns:
 	---
 	`img` :	[ numpy array ]
@@ -156,7 +137,7 @@ def get_labeled_image(img, detected_shapes):
 		colour = detected[0]
 		shape = detected[1]
 		coordinates = detected[2]
-		cv2.putText(img, str((colour, shape)),coordinates, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0), 2)
+		cv2.putText(img, str((colour, shape)), coordinates, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
 	return img
 
 if __name__ == '__main__':
