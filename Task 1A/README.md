@@ -18,10 +18,9 @@ cX => Int value (centroid coordinate of shape on horizontal X-axis direction)<br
 cY => Int value (centroid coordinate of shape on vertical Y-axis direction)<br>
 
 # Sample Screenshots
-[![MY HEADER](https://github.com/dcostat04/Shape-Color-and-coordinate-detction-using-opencv/blob/main/ggt.PNG)]
-[![MY HEADER](https://github.com/dcostat04/Shape-Color-and-coordinate-detction-using-opencv/blob/main/ggts.PNG)]
+[![Image](https://github.com/dcostat04/E-Yantra-Berryminator/blob/main/Task%201A/1.PNG)]
+[![image](https://github.com/dcostat04/E-Yantra-Berryminator/blob/main/Task%201A/2.PNG)]
 
-# Work in Progress
-still more things to be done
+
 
 # Done By Trevor Dcosta
